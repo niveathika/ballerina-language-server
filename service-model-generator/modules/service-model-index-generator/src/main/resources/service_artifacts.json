@@ -359,7 +359,7 @@
     },
     {
       "name": "ftp",
-      "version": "2.13.0",
+      "version": "2.15.0",
       "serviceTypeSkipList": [
         "Service"
       ],
@@ -387,6 +387,271 @@
           "name": "Service",
           "description": "",
           "functions": [
+            {
+              "name": "onFileJson",
+              "description": "The `onFileJson` remote method will be triggered when a json file is added to the directory",
+              "accessor": "",
+              "kind": "REMOTE",
+              "returnType": "error?",
+              "returnError": 1,
+              "returnTypeEditable": 0,
+              "enable": 0,
+              "optional": 0,
+              "parameters": [
+                {
+                  "name": "content",
+                  "label": "The File Content",
+                  "description": "The file content",
+                  "kind": "REQUIRED",
+                  "type": "json",
+                  "defaultValue": "",
+                  "importStatements": "",
+                  "nameEditable": 1,
+                  "typeEditable": 0
+                },
+                {
+                  "name": "fileInfo",
+                  "label": "FileInfo",
+                  "description": "Metadata of the file",
+                  "kind": "REQUIRED",
+                  "type": "ftp:FileInfo",
+                  "defaultValue": "",
+                  "importStatements": "",
+                  "nameEditable": 1,
+                  "typeEditable": 0
+                },
+                {
+                  "name": "caller",
+                  "label": "Caller",
+                  "description": "The FTP caller object to execute file operations",
+                  "kind": "REQUIRED",
+                  "type": "ftp:Caller",
+                  "defaultValue": "",
+                  "importStatements": "",
+                  "nameEditable": 1,
+                  "typeEditable": 0
+                }
+              ]
+            },
+            {
+              "name": "onFileXml",
+              "description": "The `onFileXml` remote method will be triggered when an XML file is added to the directory",
+              "accessor": "",
+              "kind": "REMOTE",
+              "returnType": "error?",
+              "returnError": 1,
+              "returnTypeEditable": 0,
+              "enable": 0,
+              "optional": 0,
+              "parameters": [
+                {
+                  "name": "content",
+                  "label": "The File Content",
+                  "description": "The file content",
+                  "kind": "REQUIRED",
+                  "type": "xml",
+                  "defaultValue": "",
+                  "importStatements": "",
+                  "nameEditable": 1,
+                  "typeEditable": 0
+                },
+                {
+                  "name": "fileInfo",
+                  "label": "FileInfo",
+                  "description": "Metadata of the file",
+                  "kind": "REQUIRED",
+                  "type": "ftp:FileInfo",
+                  "defaultValue": "",
+                  "importStatements": "",
+                  "nameEditable": 1,
+                  "typeEditable": 0
+                },
+                {
+                  "name": "caller",
+                  "label": "Caller",
+                  "description": "The FTP caller object to execute file operations",
+                  "kind": "REQUIRED",
+                  "type": "ftp:Caller",
+                  "defaultValue": "",
+                  "importStatements": "",
+                  "nameEditable": 1,
+                  "typeEditable": 0
+                }
+              ]
+            },
+            {
+              "name": "onFileCsv",
+              "description": "The `onFileCsv` remote method will be triggered when an CSV file is added to the directory",
+              "accessor": "",
+              "kind": "REMOTE",
+              "returnType": "error?",
+              "returnError": 1,
+              "returnTypeEditable": 0,
+              "enable": 0,
+              "optional": 0,
+              "parameters": [
+                {
+                  "name": "content",
+                  "label": "The File Content",
+                  "description": "The file content",
+                  "kind": "REQUIRED",
+                  "type": "string[][]",
+                  "defaultValue": "",
+                  "importStatements": "",
+                  "nameEditable": 1,
+                  "typeEditable": 0
+                },
+                {
+                  "name": "fileInfo",
+                  "label": "FileInfo",
+                  "description": "Metadata of the file",
+                  "kind": "REQUIRED",
+                  "type": "ftp:FileInfo",
+                  "defaultValue": "",
+                  "importStatements": "",
+                  "nameEditable": 1,
+                  "typeEditable": 0
+                },
+                {
+                  "name": "caller",
+                  "label": "Caller",
+                  "description": "The FTP caller object to execute file operations",
+                  "kind": "REQUIRED",
+                  "type": "ftp:Caller",
+                  "defaultValue": "",
+                  "importStatements": "",
+                  "nameEditable": 1,
+                  "typeEditable": 0
+                }
+              ]
+            },
+            {
+              "name": "onFileText",
+              "description": "The `onFileText` remote method will be triggered when a text file is added to the directory",
+              "accessor": "",
+              "kind": "REMOTE",
+              "returnType": "error?",
+              "returnError": 1,
+              "returnTypeEditable": 0,
+              "enable": 0,
+              "optional": 0,
+              "parameters": [
+                {
+                  "name": "content",
+                  "label": "The File Content",
+                  "description": "The file content",
+                  "kind": "REQUIRED",
+                  "type": "string",
+                  "defaultValue": "",
+                  "importStatements": "",
+                  "nameEditable": 1,
+                  "typeEditable": 0
+                },
+                {
+                  "name": "fileInfo",
+                  "label": "FileInfo",
+                  "description": "Metadata of the file",
+                  "kind": "REQUIRED",
+                  "type": "ftp:FileInfo",
+                  "defaultValue": "",
+                  "importStatements": "",
+                  "nameEditable": 1,
+                  "typeEditable": 0
+                },
+                {
+                  "name": "caller",
+                  "label": "Caller",
+                  "description": "The FTP caller object to execute file operations",
+                  "kind": "REQUIRED",
+                  "type": "ftp:Caller",
+                  "defaultValue": "",
+                  "importStatements": "",
+                  "nameEditable": 1,
+                  "typeEditable": 0
+                }
+              ]
+            },
+            {
+              "name": "onFile",
+              "description": "The `onFile` remote method will be triggered when a file is added to the directory",
+              "accessor": "",
+              "kind": "REMOTE",
+              "returnType": "error?",
+              "returnError": 1,
+              "returnTypeEditable": 0,
+              "enable": 0,
+              "optional": 0,
+              "parameters": [
+                {
+                  "name": "content",
+                  "label": "The File Content",
+                  "description": "The file content",
+                  "kind": "REQUIRED",
+                  "type": "byte[]",
+                  "defaultValue": "",
+                  "importStatements": "",
+                  "nameEditable": 1,
+                  "typeEditable": 0
+                },
+                {
+                  "name": "fileInfo",
+                  "label": "FileInfo",
+                  "description": "Metadata of the file",
+                  "kind": "REQUIRED",
+                  "type": "ftp:FileInfo",
+                  "defaultValue": "",
+                  "importStatements": "",
+                  "nameEditable": 1,
+                  "typeEditable": 0
+                },
+                {
+                  "name": "caller",
+                  "label": "Caller",
+                  "description": "The FTP caller object to execute file operations",
+                  "kind": "REQUIRED",
+                  "type": "ftp:Caller",
+                  "defaultValue": "",
+                  "importStatements": "",
+                  "nameEditable": 1,
+                  "typeEditable": 0
+                }
+              ]
+            },
+            {
+              "name": "onFileDeleted",
+              "description": "The `onFileDeleted` remote method will be triggered when a file is deleted in the directory",
+              "accessor": "",
+              "kind": "REMOTE",
+              "returnType": "error?",
+              "returnError": 1,
+              "returnTypeEditable": 0,
+              "enable": 0,
+              "optional": 0,
+              "parameters": [
+                {
+                  "name": "deletedFiles",
+                  "label": "The Deleted Files",
+                  "description": "The deleted file names",
+                  "kind": "REQUIRED",
+                  "type": "string[]",
+                  "defaultValue": "",
+                  "importStatements": "",
+                  "nameEditable": 1,
+                  "typeEditable": 0
+                },
+                {
+                  "name": "caller",
+                  "label": "Caller",
+                  "description": "The FTP caller object to execute file operations",
+                  "kind": "REQUIRED",
+                  "type": "ftp:Caller",
+                  "defaultValue": "",
+                  "importStatements": "",
+                  "nameEditable": 1,
+                  "typeEditable": 0
+                }
+              ]
+            },
             {
               "name": "onFileChange",
               "description": "The `onFileChange` remote method will be triggered when a file change event occurs",
