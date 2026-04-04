@@ -469,17 +469,61 @@ public class TypesManagerService implements ExtendedLanguageServerService {
         });
     }
 
+    private static final java.util.Set<String> TASK_DB_CONFIG_TYPES =
+            java.util.Set.of("MysqlConfig", "PostgresqlConfig");
+
     @JsonRequest
     public CompletableFuture<RecordValueGenerateResponse> generateValue(RecordValueGenerateRequest request) {
         return CompletableFuture.supplyAsync(() -> {
             RecordValueGenerateResponse response = new RecordValueGenerateResponse();
             try {
-                response.setRecordValue(RecordValueGenerator.generate(request.type().getAsJsonObject()));
+                JsonObject type = request.type().getAsJsonObject();
+                boolean needsTaskDbTypeCast = hasTaskDatabaseConfigUnion(type);
+                response.setRecordValue(RecordValueGenerator.generate(type, needsTaskDbTypeCast));
             } catch (Throwable e) {
                 response.setError(e);
             }
             return response;
         });
+    }
+
+    /**
+     * Recursively checks if the JSON type model contains a union with task module
+     * DatabaseConfig types (MysqlConfig/PostgresqlConfig) that need an explicit type cast.
+     */
+    private boolean hasTaskDatabaseConfigUnion(JsonObject json) {
+        if (json.has("typeName") && "union".equals(json.get("typeName").getAsString())
+                && json.has("members") && json.get("members").isJsonArray()) {
+            for (JsonElement member : json.getAsJsonArray("members")) {
+                JsonObject m = member.getAsJsonObject();
+                if (m.has("typeInfo")) {
+                    JsonObject typeInfo = m.getAsJsonObject("typeInfo");
+                    String moduleName = typeInfo.has("moduleName")
+                            ? typeInfo.get("moduleName").getAsString() : "";
+                    String name = typeInfo.has("name") ? typeInfo.get("name").getAsString() : "";
+                    if (moduleName.endsWith("task") && TASK_DB_CONFIG_TYPES.contains(name)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        // Check nested fields
+        if (json.has("fields") && json.get("fields").isJsonArray()) {
+            for (JsonElement field : json.getAsJsonArray("fields")) {
+                if (hasTaskDatabaseConfigUnion(field.getAsJsonObject())) {
+                    return true;
+                }
+            }
+        }
+        // Check union members recursively
+        if (json.has("members") && json.get("members").isJsonArray()) {
+            for (JsonElement member : json.getAsJsonArray("members")) {
+                if (hasTaskDatabaseConfigUnion(member.getAsJsonObject())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @JsonRequest

@@ -23,6 +23,7 @@ import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Generates the record value for a type configuration.
@@ -31,13 +32,26 @@ import java.util.List;
  */
 public class RecordValueGenerator {
 
+    private static final Set<String> TASK_DB_CONFIG_TYPES = Set.of("MysqlConfig", "PostgresqlConfig");
+
+    private final boolean needsTaskDbTypeCast;
+
+    private RecordValueGenerator(boolean needsTaskDbTypeCast) {
+        this.needsTaskDbTypeCast = needsTaskDbTypeCast;
+    }
+
     public static String generate(JsonObject json) {
+        return generate(json, false);
+    }
+
+    public static String generate(JsonObject json, boolean needsTaskDbTypeCast) {
+        RecordValueGenerator generator = new RecordValueGenerator(needsTaskDbTypeCast);
         StringBuilder builder = new StringBuilder();
-        generateValue(json, builder, 0);
+        generator.generateValue(json, builder, 0);
         return builder.toString();
     }
 
-    private static void generateValue(JsonObject json, StringBuilder builder, int indentLevel) {
+    private void generateValue(JsonObject json, StringBuilder builder, int indentLevel) {
         boolean hasTypeName = json.has("typeName");
         if (hasTypeName) {
             String typeName = json.get("typeName").getAsString();
@@ -59,7 +73,7 @@ public class RecordValueGenerator {
         }
     }
 
-    private static void generateEnumValue(JsonObject jsonObject, StringBuilder builder, int indentLevel) {
+    private void generateEnumValue(JsonObject jsonObject, StringBuilder builder, int indentLevel) {
         if (jsonObject.has("members") && jsonObject.get("members").isJsonArray()) {
             JsonElement members = jsonObject.get("members");
             for (JsonElement member : members.getAsJsonArray()) {
@@ -76,7 +90,7 @@ public class RecordValueGenerator {
         }
     }
 
-    private static void generateUnionValue(JsonObject union, StringBuilder builder, int indentLevel) {
+    private void generateUnionValue(JsonObject union, StringBuilder builder, int indentLevel) {
         if (union.has("selected") && union.get("selected").getAsBoolean() &&
                 union.has("value") && !union.get("value").getAsString().isEmpty()) {
             builder.append(union.get("value").getAsString());
@@ -89,6 +103,9 @@ public class RecordValueGenerator {
                 for (JsonElement member : members.getAsJsonArray()) {
                     JsonObject memberObj = member.getAsJsonObject();
                     if (memberObj.has("selected") && memberObj.get("selected").getAsBoolean()) {
+                        if (needsTaskDbTypeCast) {
+                            appendTaskDbTypeCast(memberObj, builder);
+                        }
                         generateValue(memberObj, builder, indentLevel);
                         break;
                     }
@@ -97,7 +114,22 @@ public class RecordValueGenerator {
         }
     }
 
-    private static void generateRecordValue(JsonObject jsonObject, StringBuilder builder, int indentLevel) {
+    private static void appendTaskDbTypeCast(JsonObject member, StringBuilder builder) {
+        if (!"record".equals(member.has("typeName") ? member.get("typeName").getAsString() : "")
+                || !member.has("typeInfo")) {
+            return;
+        }
+        JsonObject typeInfo = member.getAsJsonObject("typeInfo");
+        String name = typeInfo.has("name") ? typeInfo.get("name").getAsString() : "";
+        String moduleName = typeInfo.has("moduleName") ? typeInfo.get("moduleName").getAsString() : "";
+        if (moduleName.endsWith("task") && TASK_DB_CONFIG_TYPES.contains(name)) {
+            String modulePrefix = moduleName.contains(".")
+                    ? moduleName.substring(moduleName.lastIndexOf('.') + 1) : moduleName;
+            builder.append("<").append(modulePrefix).append(":").append(name).append(">");
+        }
+    }
+
+    private void generateRecordValue(JsonObject jsonObject, StringBuilder builder, int indentLevel) {
         if (jsonObject.has("selected") && !jsonObject.get("selected").getAsBoolean()) {
             return;
         }
@@ -129,7 +161,7 @@ public class RecordValueGenerator {
         builder.append("\n").append(indent).append("}");
     }
 
-    private static void generateDefaultValue(JsonObject jsonObject, StringBuilder builder, int indentLevel) {
+    private void generateDefaultValue(JsonObject jsonObject, StringBuilder builder, int indentLevel) {
         if (!jsonObject.has("typeName")) {
             return;
         }

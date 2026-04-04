@@ -751,10 +751,32 @@ public class ServiceModelGeneratorService implements ExtendedLanguageServerServi
                     return new CommonSourceResponse();
                 }
 
+                ModulePartNode modulePartNode = document.get().syntaxTree().rootNode();
+                List<TextEdit> edits = new ArrayList<>();
+
+                // Add imports from property values (e.g., for task:DatabaseConfig type casts)
+                for (Value value : listener.getProperties().values()) {
+                    Map<String, String> valueImports = value.getImports();
+                    if (valueImports != null) {
+                        for (String importValue : valueImports.values()) {
+                            String[] parts = importValue.split("/");
+                            if (parts.length == 2) {
+                                String org = parts[0];
+                                String module = parts[1].split(":")[0];
+                                if (!importExists(modulePartNode, org, module)) {
+                                    edits.add(new TextEdit(Utils.toRange(
+                                            modulePartNode.lineRange().startLine()),
+                                            getImportStmt(org, module)));
+                                }
+                            }
+                        }
+                    }
+                }
+
                 LineRange lineRange = listener.getCodedata().getLineRange();
                 String listenerDeclaration = listener.getListenerDefinition();
-                TextEdit basePathEdit = new TextEdit(Utils.toRange(lineRange), listenerDeclaration);
-                return new CommonSourceResponse(Map.of(request.filePath(), List.of(basePathEdit)));
+                edits.add(new TextEdit(Utils.toRange(lineRange), listenerDeclaration));
+                return new CommonSourceResponse(Map.of(request.filePath(), edits));
             } catch (Throwable e) {
                 return new CommonSourceResponse(e);
             }
